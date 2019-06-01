@@ -55,8 +55,13 @@ Looks like:
 # Images
 
 ```
-![name of picture](link)
+![logo](/static/logo.png)
 ```
+
+Looks like:
+
+![logo](/static/logo.png)
+
 
 # Block of text
 

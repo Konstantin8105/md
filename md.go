@@ -66,7 +66,9 @@ func main() {
 	// generate articles
 	http.HandleFunc("/articles/", articleHandler)
 
-	// TODO : check pictures
+	// static files for example: pictures
+	fs := http.FileServer(http.Dir("static"))
+	http.Handle("/static/", http.StripPrefix("/static/", fs))
 
 	// start server
 	if err := http.ListenAndServe(":"+*port, nil); err != nil {
