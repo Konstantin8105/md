@@ -103,7 +103,7 @@ func mainHandler(w http.ResponseWriter, r *http.Request) {
 			return fmt.Errorf("Cannot walk: %v", err)
 		}
 		// generate markdown main page
-		var mainTmpl string = "# Основная страница со списком статей.\n"
+		var mainTmpl string = "# List of articles:\n"
 		for _, file := range mdFiles {
 			// get name of article
 			var name string = file
