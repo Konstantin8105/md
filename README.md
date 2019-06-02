@@ -55,12 +55,12 @@ Looks like:
 # Images
 
 ```
-![logo](/static/logo.png)
+![logo](logo.png)
 ```
 
 Looks like:
 
-![logo](/static/logo.png)
+![logo](logo.png)
 
 
 # Block of text

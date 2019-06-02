@@ -66,10 +66,6 @@ func main() {
 	// generate articles
 	http.HandleFunc("/articles/", articleHandler)
 
-	// static files for example: pictures
-	fs := http.FileServer(http.Dir("static"))
-	http.Handle("/static/", http.StripPrefix("/static/", fs))
-
 	// start server
 	if err := http.ListenAndServe(":"+*port, nil); err != nil {
 		fmt.Fprintf(os.Stderr, "Server error : %v", err)
@@ -98,7 +94,7 @@ func mainHandler(w http.ResponseWriter, r *http.Request) {
 			}
 			// get filename markdown files
 			if strings.HasSuffix(info.Name(), ".md") {
-				mdFiles = append(mdFiles, info.Name())
+				mdFiles = append(mdFiles, path)
 			}
 			return nil
 		}); err != nil {
@@ -106,12 +102,14 @@ func mainHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		// generate markdown main page
 		var mainTmpl string = "# List of articles:\n"
-		for _, file := range mdFiles {
+		for i := range mdFiles {
 			// get name of article
-			var name string = file
+			var name string = mdFiles[i]
+
+			fmt.Println(name)
 
 			// add to main page
-			mainTmpl += fmt.Sprintf("\n* [%s](/articles/%s)\n", name, file)
+			mainTmpl += fmt.Sprintf("\n* [%s](/articles/%s)\n", name, mdFiles[i])
 		}
 		// generate html by markdown
 		html := blackfriday.MarkdownCommon([]byte(mainTmpl))
@@ -140,15 +138,19 @@ func articleHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		// get file content
-		var content []byte
-		content, err = ioutil.ReadFile(title)
-		if err != nil {
-			err = fmt.Errorf("Cannot read file: %v", err)
-			return
+		if strings.HasSuffix(title, ".md") {
+			var content []byte
+			content, err = ioutil.ReadFile(title)
+			if err != nil {
+				err = fmt.Errorf("Cannot read file: %v", err)
+				return
+			}
+			// generate markdown
+			html := blackfriday.MarkdownCommon(content)
+			fmt.Fprintf(w, tmpl, html)
+		} else {
+			http.ServeFile(w, r, title)
 		}
-		// generate markdown
-		html := blackfriday.MarkdownCommon(content)
-		fmt.Fprintf(w, tmpl, html)
 		return
 	}(); err != nil {
 		fmt.Fprintf(w, "Error : %v", err)
