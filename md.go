@@ -112,7 +112,7 @@ func mainHandler(w http.ResponseWriter, r *http.Request) {
 			mainTmpl += fmt.Sprintf("\n* [%s](/articles/%s)\n", name, mdFiles[i])
 		}
 		// generate html by markdown
-		html := blackfriday.MarkdownCommon([]byte(mainTmpl))
+		html := blackfriday.Run([]byte(mainTmpl))
 		fmt.Fprintf(w, tmpl, html)
 		return
 	}(); err != nil {
@@ -146,7 +146,7 @@ func articleHandler(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 			// generate markdown
-			html := blackfriday.MarkdownCommon(content)
+			html := blackfriday.Run(content)
 			fmt.Fprintf(w, tmpl, html)
 		} else {
 			http.ServeFile(w, r, title)
