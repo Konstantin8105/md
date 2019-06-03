@@ -131,6 +131,9 @@ func articleHandler(w http.ResponseWriter, r *http.Request) {
 			err = fmt.Errorf("Title of article is empty")
 			return
 		}
+		// secury fix of title
+		// avoid word ".."
+		title = strings.ReplaceAll(title, "..", "doubledot")
 		// get file content
 		if strings.HasSuffix(title, ".md") {
 			var content []byte
