@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
@@ -98,6 +99,9 @@ func mainHandler(w http.ResponseWriter, r *http.Request) {
 				// get name of article
 				name := path
 
+				// escape space
+				path = url.QueryEscape(path)
+
 				// add to main page
 				mainTmpl += fmt.Sprintf("\n* [%s](/articles/%s)\n", name, path)
 			}
@@ -129,6 +133,12 @@ func articleHandler(w http.ResponseWriter, r *http.Request) {
 		title = strings.TrimSpace(title)
 		if title == "" {
 			err = fmt.Errorf("Title of article is empty")
+			return
+		}
+		// Unescape url
+		title, err = url.QueryUnescape(title)
+		if title == "" {
+			err = fmt.Errorf("Cannot unescape : %v", err)
 			return
 		}
 		// secury fix of title
