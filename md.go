@@ -82,8 +82,9 @@ func mainHandler(w http.ResponseWriter, r *http.Request) {
 				err = fmt.Errorf("Try open page: %v. %v", r.URL.Path, err)
 			}
 		}()
+		// generate markdown main page
+		var mainTmpl string = "# List of articles:\n"
 		// find all markdown files
-		var mdFiles []string
 		if err = filepath.Walk(".", func(path string, info os.FileInfo, err error) error {
 			if err != nil {
 				fmt.Printf("prevent panic by handling failure accessing a path %q: %v\n", path, err)
@@ -94,22 +95,15 @@ func mainHandler(w http.ResponseWriter, r *http.Request) {
 			}
 			// get filename markdown files
 			if strings.HasSuffix(info.Name(), ".md") {
-				mdFiles = append(mdFiles, path)
+				// get name of article
+				name := path
+
+				// add to main page
+				mainTmpl += fmt.Sprintf("\n* [%s](/articles/%s)\n", name, path)
 			}
 			return nil
 		}); err != nil {
 			return fmt.Errorf("Cannot walk: %v", err)
-		}
-		// generate markdown main page
-		var mainTmpl string = "# List of articles:\n"
-		for i := range mdFiles {
-			// get name of article
-			var name string = mdFiles[i]
-
-			fmt.Println(name)
-
-			// add to main page
-			mainTmpl += fmt.Sprintf("\n* [%s](/articles/%s)\n", name, mdFiles[i])
 		}
 		// generate html by markdown
 		html := blackfriday.Run([]byte(mainTmpl))
