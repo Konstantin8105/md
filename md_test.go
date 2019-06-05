@@ -33,6 +33,16 @@ func Test(t *testing.T) {
 		},
 		{
 			handler:        articleHandler,
+			url:            "/article//////////////file_not_exist.md",
+			expectFilename: "test.article-file-not-exist-md",
+		},
+		{
+			handler:        articleHandler,
+			url:            "/article/LICENSE",
+			expectFilename: "test.article-LICENSE",
+		},
+		{
+			handler:        articleHandler,
 			url:            "/article/not_exist_file",
 			expectFilename: "test.article-not-exist-file",
 		},
