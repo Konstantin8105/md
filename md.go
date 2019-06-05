@@ -175,21 +175,23 @@ func articleHandler(w http.ResponseWriter, r *http.Request) {
 			err = fmt.Errorf("Cannot unescape : %v", err)
 			return
 		}
+
 		// secury fix of title
 		// avoid word ".."
 		title = strings.ReplaceAll(title, "..", "doubledot")
+
+		// Windows specific
+		if runtime.GOOS == "windows" {
+			title = strings.Replace(title, "/", "\\", -1)
+		}
+
+		// fix first letter
+		if len(title) > 0 && (title[0] == '\\' || title[0] == '/') {
+			title = title[1:]
+		}
+
 		// get file content
 		if strings.HasSuffix(title, ".md") {
-
-			// Windows specific
-			if runtime.GOOS == "windows" {
-				title = strings.Replace(title, "/", "\\", -1)
-			}
-
-			if len(title) > 0 && (title[0] == '\\' || title[0] == '/') {
-				title = title[1:]
-			}
-
 			var content []byte
 			content, err = ioutil.ReadFile(title)
 			if err != nil {
