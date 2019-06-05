@@ -22,7 +22,7 @@ var tmpl = `
 			.markdown-body {
 				box-sizing: border-box;
 				min-width: 200px;
-				max-width: 600px;
+				max-width: 900px;
 				margin: 0 auto;
 				padding: 45px;
 			}
@@ -85,7 +85,7 @@ func mainHandler(w http.ResponseWriter, r *http.Request) {
 			}
 		}()
 		// generate markdown main page
-		var mainTmpl string = "# List of articles:\n"
+		var mainTmpl string = "# List of articles:\n\n"
 		// find all markdown files
 		if err = filepath.Walk(".", func(path string, info os.FileInfo, err error) error {
 			if err != nil {
@@ -97,20 +97,42 @@ func mainHandler(w http.ResponseWriter, r *http.Request) {
 			}
 			// get filename markdown files
 			if strings.HasSuffix(info.Name(), ".md") {
+				base := path
 
 				// Windows specific
 				if runtime.GOOS == "windows" {
 					path = strings.Replace(path, "\\", "/", -1)
 				}
 
+				// timestamp
+				modifiedtime := info.ModTime()
+
 				// get name of article
 				name := path
+				{
+					var content []byte
+					content, err = ioutil.ReadFile(path)
+					if err == nil {
+						title := string(content[:200])
+						index := strings.Index(title, "\n")
+						if index > 0 {
+							if title = strings.TrimSpace(title[:index]); title != "" {
+								name = title
+							}
+						}
+					}
+				}
 
 				// escape space
 				path = url.QueryEscape(path)
 
 				// add to main page
-				mainTmpl += fmt.Sprintf("\n* [%s](/articles/%s)\n", name, path)
+				mainTmpl += "------\n\n"
+				mainTmpl += fmt.Sprintf("**Name**: %s\n\n", name)
+				mainTmpl += fmt.Sprintf("**Modified time**: %s\n\n",
+					modifiedtime.Format("Mon Jan 2 15:04:05 MST 2006"))
+				mainTmpl += fmt.Sprintf("**Link**: [%s](/articles/%s)\n\n",
+					base, path)
 			}
 			return nil
 		}); err != nil {
