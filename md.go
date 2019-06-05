@@ -137,11 +137,11 @@ func articleHandler(w http.ResponseWriter, r *http.Request) {
 		}()
 		// get title
 		path := r.URL.Path
-		if len(path) < len("/articles/") {
+		if len(path) <= len("/articles/") {
 			err = fmt.Errorf("URL path is too small: %s", path)
 			return
 		}
-		title := path[len("/articles/"):]
+		title := path[len("/articles/")-1:]
 		title = strings.TrimSpace(title)
 		if title == "" {
 			err = fmt.Errorf("Title of article is empty")
@@ -167,7 +167,7 @@ func articleHandler(w http.ResponseWriter, r *http.Request) {
 			var content []byte
 			content, err = ioutil.ReadFile(title)
 			if err != nil {
-				err = fmt.Errorf("Cannot read file: %v", err)
+				err = fmt.Errorf("Cannot read file `%s`: %v", title, err)
 				return
 			}
 			//
