@@ -8,6 +8,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 
 	"github.com/russross/blackfriday"
@@ -96,6 +97,12 @@ func mainHandler(w http.ResponseWriter, r *http.Request) {
 			}
 			// get filename markdown files
 			if strings.HasSuffix(info.Name(), ".md") {
+
+				// Windows specific
+				if runtime.GOOS == "windows" {
+					path = strings.Replace(path, "\\", "/", -1)
+				}
+
 				// get name of article
 				name := path
 
@@ -129,7 +136,12 @@ func articleHandler(w http.ResponseWriter, r *http.Request) {
 			}
 		}()
 		// get title
-		title := r.URL.Path[len("/articles/"):]
+		path := r.URL.Path
+		if len(path) < len("/articles/") {
+			err = fmt.Errorf("URL path is too small: %s", path)
+			return
+		}
+		title := path[len("/articles/"):]
 		title = strings.TrimSpace(title)
 		if title == "" {
 			err = fmt.Errorf("Title of article is empty")
@@ -146,14 +158,24 @@ func articleHandler(w http.ResponseWriter, r *http.Request) {
 		title = strings.ReplaceAll(title, "..", "doubledot")
 		// get file content
 		if strings.HasSuffix(title, ".md") {
+
+			// Windows specific
+			if runtime.GOOS == "windows" {
+				title = strings.Replace(title, "/", "\\", -1)
+			}
+
 			var content []byte
 			content, err = ioutil.ReadFile(title)
 			if err != nil {
 				err = fmt.Errorf("Cannot read file: %v", err)
 				return
 			}
+			//
+			str := string(content)
+			str = strings.Replace(str, "\r", "", -1)
+
 			// generate markdown
-			html := blackfriday.Run(content)
+			html := blackfriday.Run([]byte(str))
 			fmt.Fprintf(w, tmpl, html)
 		} else {
 			http.ServeFile(w, r, title)

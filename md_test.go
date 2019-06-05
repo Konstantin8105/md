@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -66,4 +67,22 @@ func Test(t *testing.T) {
 	if !bytes.Equal(greeting, expect) {
 		t.Errorf("Not same: `%s`", greeting)
 	}
+}
+
+func TestResponce(t *testing.T) {
+	req := httptest.NewRequest("GET", "/article/README.md", nil)
+	w := httptest.NewRecorder()
+	articleHandler(w, req)
+
+	resp := w.Result()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if resp.StatusCode != 200 {
+		t.Errorf("Status is not correct: %v", resp.StatusCode)
+	}
+
+	fmt.Println(string(body))
 }
