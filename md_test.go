@@ -3,70 +3,71 @@ package main
 import (
 	"bytes"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"testing"
 )
 
 func Test(t *testing.T) {
 
-	ts := httptest.NewServer(http.HandlerFunc(mainHandler))
-	defer ts.Close()
-
-	res, err := http.Get(ts.URL)
-	if err != nil {
-		t.Fatal(err)
+	tcs := []struct {
+		handler        func(w http.ResponseWriter, r *http.Request)
+		url            string
+		expectFilename string
+	}{
+		{
+			handler:        mainHandler,
+			url:            "/",
+			expectFilename: "test.main-index",
+		},
+		{
+			handler:        articleHandler,
+			url:            "/article/",
+			expectFilename: "test.article-empty",
+		},
+		{
+			handler:        articleHandler,
+			url:            "/article/README.md",
+			expectFilename: "test.article-README",
+		},
+		{
+			handler:        articleHandler,
+			url:            "/article/not_exist_file",
+			expectFilename: "test.article-not-exist-file",
+		},
 	}
-	actual, err := ioutil.ReadAll(res.Body)
-	res.Body.Close()
-	if err != nil {
-		log.Fatal(err)
-	}
 
-	expect := []byte(`
-<html>
-	<head>
-		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<style>
-			.markdown-body {
-				box-sizing: border-box;
-				min-width: 200px;
-				max-width: 600px;
-				margin: 0 auto;
-				padding: 45px;
+	for i := range tcs {
+		t.Run(tcs[i].url, func(t *testing.T) {
+			req := httptest.NewRequest("GET", tcs[i].url, nil)
+			w := httptest.NewRecorder()
+			tcs[i].handler(w, req)
+
+			resp := w.Result()
+			body, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				t.Fatal(err)
 			}
-			@media (max-width: 767px) {
-				.markdown-body {
-					padding: 15px;
+
+			body = bytes.Replace(body, []byte("%2F"), []byte("/"), -1)
+			body = bytes.Replace(body, []byte("+"), []byte(" "), -1)
+
+			if os.Getenv("UPDATE") == "true" {
+				err = ioutil.WriteFile(tcs[i].expectFilename, body, 0644)
+				if err != nil {
+					t.Fatal(err)
 				}
 			}
-	</style>
-	</head>
-	<body>
-		<article class="markdown-body">
-			<h1>List of articles:</h1>
 
-<ul>
-<li><p><a href="/articles/README.md">README.md</a></p></li>
+			content, err := ioutil.ReadFile(tcs[i].expectFilename)
+			if err != nil {
+				t.Fatal(err)
+			}
 
-<li><p><a href="/articles/testdata/folder with space/testSpace.md">testdata/folder with space/testSpace.md</a></p></li>
-
-<li><p><a href="/articles/testdata/test.md">testdata/test.md</a></p></li>
-
-<li><p><a href="/articles/vendor/github.com/russross/blackfriday/README.md">vendor/github.com/russross/blackfriday/README.md</a></p></li>
-
-<li><p><a href="/articles/vendor/github.com/shurcooL/sanitized_anchor_name/README.md">vendor/github.com/shurcooL/sanitized_anchor_name/README.md</a></p></li>
-</ul>
-
-		</article>
-	</body>
-</html>`)
-
-	actual = bytes.Replace(actual, []byte("%2F"), []byte("/"), -1)
-	actual = bytes.Replace(actual, []byte("+"), []byte(" "), -1)
-
-	if !bytes.Equal(actual, expect) {
-		t.Errorf("Not same: `%s`", actual)
+			if !bytes.Equal(body, content) {
+				t.Errorf("%s", body)
+			}
+		})
 	}
 }

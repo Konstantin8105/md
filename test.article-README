@@ -1,0 +1,139 @@
+
+<html>
+	<head>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<style>
+			.markdown-body {
+				box-sizing: border-box;
+				min-width: 200px;
+				max-width: 900px;
+				margin: 0 auto;
+				padding: 45px;
+			}
+			@media (max-width: 767px) {
+				.markdown-body {
+					padding: 15px;
+				}
+			}
+	</style>
+	</head>
+	<body>
+		<article class="markdown-body">
+			<h1>md</h1>
+
+<p>minimal markdown web blog</p>
+
+<p>Markdown specification:</p>
+
+<h1>Headers</h1>
+
+<pre><code># H1
+## H2
+### H3
+#### H4
+##### H5
+###### H6
+</code></pre>
+
+<p>Looks like :</p>
+
+<h1>H1</h1>
+
+<h2>H2</h2>
+
+<h3>H3</h3>
+
+<h4>H4</h4>
+
+<h5>H5</h5>
+
+<h6>H6</h6>
+
+<h1>Lists</h1>
+
+<pre><code>* Item 1
+* Item 2
+* Item 3
+</code></pre>
+
+<p>Looks like:</p>
+
+<ul>
+<li>Item 1</li>
+<li>Item 2</li>
+<li>Item 3</li>
+</ul>
+
+<h1>Links</h1>
+
+<pre><code>[name of link](link)
+
+[search](google.com)
+</code></pre>
+
+<p>Looks like:</p>
+
+<p><a href="link">name of link</a></p>
+
+<p><a href="google.com">search</a></p>
+
+<h1>Images</h1>
+
+<pre><code>![logo](logo.png)
+</code></pre>
+
+<p>Looks like:</p>
+
+<p><img src="logo.png" alt="logo" /></p>
+
+<h1>Block of text</h1>
+
+<pre><code>Block begin from ``` and ended ```.
+</code></pre>
+
+<h1>Tables</h1>
+
+<pre><code>
+| Tables        | Are           | Cool  |
+| ------------- |:-------------:| -----:|
+| col 3 is      | right-aligned | $1600 |
+| col 2 is      | centered      |   $12 |
+| zebra stripes | are neat      |    $1 |
+
+</code></pre>
+
+<p>Looks like:</p>
+
+<table>
+<thead>
+<tr>
+<th>Tables</th>
+<th align="center">Are</th>
+<th align="right">Cool</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>col 3 is</td>
+<td align="center">right-aligned</td>
+<td align="right">$1600</td>
+</tr>
+
+<tr>
+<td>col 2 is</td>
+<td align="center">centered</td>
+<td align="right">$12</td>
+</tr>
+
+<tr>
+<td>zebra stripes</td>
+<td align="center">are neat</td>
+<td align="right">$1</td>
+</tr>
+</tbody>
+</table>
+
+		</article>
+	</body>
+</html>
