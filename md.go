@@ -164,6 +164,10 @@ func articleHandler(w http.ResponseWriter, r *http.Request) {
 				title = strings.Replace(title, "/", "\\", -1)
 			}
 
+			if len(title) > 0 && (title[0] == '\\' || title[0] == '/') {
+				title = title[1:]
+			}
+
 			var content []byte
 			content, err = ioutil.ReadFile(title)
 			if err != nil {
