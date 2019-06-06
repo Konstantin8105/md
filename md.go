@@ -143,7 +143,7 @@ func mainHandler(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, tmpl, html)
 		return
 	}(); err != nil {
-		fmt.Fprintf(w, "Error : %v", err)
+		fmt.Fprintf(w, "Error : %v\n", err)
 	}
 }
 
@@ -210,6 +210,6 @@ func articleHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}(); err != nil {
-		fmt.Fprintf(w, "Error : %v", err)
+		fmt.Fprintf(w, "Error : %v\n", err)
 	}
 }
