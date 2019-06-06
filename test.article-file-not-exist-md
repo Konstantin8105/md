@@ -1,1 +1,1 @@
-Error : Try open page: /article//////////////file_not_exist.md. Cannot read file `\\\\\\\\\\\\file_not_exist.md`: open \\\\\\\\\\\\file_not_exist.md: The specified path is invalid.
+Error : Try open page: /article//////////////file_not_exist.md. Cannot read file `////////////file_not_exist.md`: open ////////////file_not_exist.md: no such file or directory

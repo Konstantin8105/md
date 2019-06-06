@@ -23,33 +23,35 @@
 
 <hr />
 
-<p><strong>Name</strong>: # md</p>
+<h1>.</h1>
 
-<p><strong>Link</strong>: <a href="/articles/README.md">README.md</a></p>
-
-<hr />
-
-<p><strong>Name</strong>: # test in folder with space</p>
-
-<p><strong>Link</strong>: <a href="/articles/testdata/folder with space/testSpace.md">testdata/folder with space/testSpace.md</a></p>
+<p><a href="/articles/./README.md">md</a></p>
 
 <hr />
 
-<p><strong>Name</strong>: # test file</p>
+<h2>./testdata</h2>
 
-<p><strong>Link</strong>: <a href="/articles/testdata/test.md">testdata/test.md</a></p>
-
-<hr />
-
-<p><strong>Name</strong>: Blackfriday <a href="https://travis-ci.org/russross/blackfriday"><img src="https://travis-ci.org/russross/blackfriday.svg?branch=master" alt="Build Status" /></a></p>
-
-<p><strong>Link</strong>: <a href="/articles/vendor/github.com/russross/blackfriday/README.md">vendor/github.com/russross/blackfriday/README.md</a></p>
+<p><a href="/articles/./testdata/test.md">test file</a></p>
 
 <hr />
 
-<p><strong>Name</strong>: sanitized_anchor_name</p>
+<h3>./testdata/folder with space</h3>
 
-<p><strong>Link</strong>: <a href="/articles/vendor/github.com/shurcooL/sanitized_anchor_name/README.md">vendor/github.com/shurcooL/sanitized_anchor_name/README.md</a></p>
+<p><a href="/articles/./testdata/folder with space/testSpace.md">test in folder with space</a></p>
+
+<hr />
+
+<h3>./vendor/github.com/russross/blackfriday</h3>
+
+<p><a href="/articles/./vendor/github.com/russross/blackfriday/README.md">Blackfriday <a href="https://travis-ci.org/russross/blackfriday"><img src="https://travis-ci.org/russross/blackfriday.svg?branch=master" alt="Build Status" /></a></a></p>
+
+<hr />
+
+<h3>./vendor/github.com/shurcooL/sanitized_anchor_name</h3>
+
+<p><a href="/articles/./vendor/github.com/shurcooL/sanitized_anchor_name/README.md">sanitized_anchor_name</a></p>
+
+<hr />
 
 		</article>
 	</body>

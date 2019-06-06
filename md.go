@@ -7,8 +7,8 @@ import (
 	"net/http"
 	"net/url"
 	"os"
-	"path/filepath"
 	"runtime"
+	"sort"
 	"strings"
 
 	"github.com/russross/blackfriday"
@@ -86,24 +86,75 @@ func mainHandler(w http.ResponseWriter, r *http.Request) {
 		}()
 		// generate markdown main page
 		var mainTmpl string = "# List of articles:\n\n"
-		// find all markdown files
-		if err = filepath.Walk(".", func(path string, info os.FileInfo, err error) error {
+		// get all folders
+		var getFolder func(string) ([]string, error)
+		getFolder = func(baseFolder string) (fs []string, err error) {
+			files, err := ioutil.ReadDir(baseFolder)
 			if err != nil {
-				fmt.Printf("prevent panic by handling failure accessing a path %q: %v\n", path, err)
+				return nil, err
+			}
+			for _, file := range files {
+				if !file.IsDir() {
+					continue
+				}
+				if file.Name() == ".git" {
+					continue
+				}
+				fs = append(fs, baseFolder+string(os.PathSeparator)+file.Name())
+			}
+			size := len(fs)
+			for i := 0; i < size; i++ {
+				fss, err := getFolder(fs[i])
+				if err != nil {
+					return nil, err
+				}
+				fs = append(fs, fss...)
+			}
+
+			return fs, nil
+		}
+		folders, err := getFolder(".")
+		if err != nil {
+			return err
+		}
+		folders = append(folders, ".")
+		sort.Strings(folders)
+
+		// find all markdown files
+		for i := range folders {
+
+			files, err := ioutil.ReadDir(folders[i])
+			if err != nil {
 				return err
 			}
-			if info.IsDir() {
-				return nil
-			}
-			// get filename markdown files
-			if strings.HasSuffix(info.Name(), ".md") {
+			sort.Slice(files, func(i, j int) bool { return files[i].Name() < files[j].Name() })
+			var folderHeader bool
+			for _, file := range files {
+				if file.IsDir() {
+					continue
+				}
+				if !strings.HasSuffix(file.Name(), ".md") {
+					continue
+				}
+
+				if !folderHeader {
+					folderHeader = true
+
+					mainTmpl += "------\n\n"
+					count := strings.Count(folders[i], "\\")
+					count += strings.Count(folders[i], "/")
+					count++
+					for i := 0; i < count && i < 3; i++ {
+						mainTmpl += "#"
+					}
+					mainTmpl += fmt.Sprintf(" %s\n\n", folders[i])
+				}
+				path := folders[i] + string(os.PathSeparator) + file.Name()
+
 				// Windows specific
 				if runtime.GOOS == "windows" {
 					path = strings.Replace(path, "\\", "/", -1)
-					path = strings.Replace(path, "\\", "/", -1)
 				}
-
-				base := path
 
 				// get name of article
 				name := path
@@ -116,6 +167,8 @@ func mainHandler(w http.ResponseWriter, r *http.Request) {
 						if index > 0 {
 							if title = strings.TrimSpace(title[:index]); title != "" {
 								name = title
+								name = strings.ReplaceAll(name, "#", " ")
+								name = strings.TrimSpace(name)
 							}
 						}
 					}
@@ -125,15 +178,12 @@ func mainHandler(w http.ResponseWriter, r *http.Request) {
 				path = url.QueryEscape(path)
 
 				// add to main page
-				mainTmpl += "------\n\n"
-				mainTmpl += fmt.Sprintf("**Name**: %s\n\n", name)
-				mainTmpl += fmt.Sprintf("**Link**: [%s](/articles/%s)\n\n",
-					base, path)
+				mainTmpl += fmt.Sprintf("[%s](/articles/%s)\n\n", name, path)
+				mainTmpl += "\n\n"
 			}
-			return nil
-		}); err != nil {
-			return fmt.Errorf("Cannot walk: %v", err)
 		}
+		mainTmpl += "------\n\n"
+
 		// generate html by markdown
 		html := blackfriday.Run([]byte(mainTmpl))
 		fmt.Fprintf(w, tmpl, html)
@@ -191,6 +241,9 @@ func articleHandler(w http.ResponseWriter, r *http.Request) {
 			var content []byte
 			content, err = ioutil.ReadFile(title)
 			if err != nil {
+				if runtime.GOOS == "windows" {
+					title = strings.Replace(title, "\\", "/", -1)
+				}
 				err = fmt.Errorf("Cannot read file `%s`: %v", title, err)
 				return
 			}
