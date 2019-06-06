@@ -97,15 +97,13 @@ func mainHandler(w http.ResponseWriter, r *http.Request) {
 			}
 			// get filename markdown files
 			if strings.HasSuffix(info.Name(), ".md") {
-				base := path
-
 				// Windows specific
 				if runtime.GOOS == "windows" {
 					path = strings.Replace(path, "\\", "/", -1)
+					path = strings.Replace(path, "\\", "/", -1)
 				}
 
-				// timestamp
-				modifiedtime := info.ModTime()
+				base := path
 
 				// get name of article
 				name := path
@@ -129,8 +127,6 @@ func mainHandler(w http.ResponseWriter, r *http.Request) {
 				// add to main page
 				mainTmpl += "------\n\n"
 				mainTmpl += fmt.Sprintf("**Name**: %s\n\n", name)
-				mainTmpl += fmt.Sprintf("**Modified time**: %s\n\n",
-					modifiedtime.Format("Mon Jan 2 15:04:05 MST 2006"))
 				mainTmpl += fmt.Sprintf("**Link**: [%s](/articles/%s)\n\n",
 					base, path)
 			}

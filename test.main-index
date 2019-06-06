@@ -25,15 +25,11 @@
 
 <p><strong>Name</strong>: # md</p>
 
-<p><strong>Modified time</strong>: Sun Jun 2 13:49:00 MSK 2019</p>
-
 <p><strong>Link</strong>: <a href="/articles/README.md">README.md</a></p>
 
 <hr />
 
 <p><strong>Name</strong>: # test in folder with space</p>
-
-<p><strong>Modified time</strong>: Mon Jun 3 22:42:31 MSK 2019</p>
 
 <p><strong>Link</strong>: <a href="/articles/testdata/folder with space/testSpace.md">testdata/folder with space/testSpace.md</a></p>
 
@@ -41,23 +37,17 @@
 
 <p><strong>Name</strong>: # test file</p>
 
-<p><strong>Modified time</strong>: Mon Jun 3 22:41:45 MSK 2019</p>
-
 <p><strong>Link</strong>: <a href="/articles/testdata/test.md">testdata/test.md</a></p>
 
 <hr />
 
 <p><strong>Name</strong>: Blackfriday <a href="https://travis-ci.org/russross/blackfriday"><img src="https://travis-ci.org/russross/blackfriday.svg?branch=master" alt="Build Status" /></a></p>
 
-<p><strong>Modified time</strong>: Sun Jun 2 14:07:42 MSK 2019</p>
-
 <p><strong>Link</strong>: <a href="/articles/vendor/github.com/russross/blackfriday/README.md">vendor/github.com/russross/blackfriday/README.md</a></p>
 
 <hr />
 
 <p><strong>Name</strong>: sanitized_anchor_name</p>
-
-<p><strong>Modified time</strong>: Sun Jun 2 14:07:42 MSK 2019</p>
 
 <p><strong>Link</strong>: <a href="/articles/vendor/github.com/shurcooL/sanitized_anchor_name/README.md">vendor/github.com/shurcooL/sanitized_anchor_name/README.md</a></p>
 
