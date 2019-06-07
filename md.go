@@ -147,7 +147,11 @@ func mainHandler(w http.ResponseWriter, r *http.Request) {
 					for i := 0; i < count && i < 3; i++ {
 						mainTmpl += "#"
 					}
-					mainTmpl += fmt.Sprintf(" %s\n\n", folders[i])
+					f := folders[i]
+					if runtime.GOOS == "windows" {
+						f = strings.Replace(f, "\\", "/", -1)
+					}
+					mainTmpl += fmt.Sprintf(" %s\n\n", f)
 				}
 				path := folders[i] + string(os.PathSeparator) + file.Name()
 
