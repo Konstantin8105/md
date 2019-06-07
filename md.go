@@ -255,6 +255,9 @@ func articleHandler(w http.ResponseWriter, r *http.Request) {
 			str := string(content)
 			str = strings.Replace(str, "\r", "", -1)
 
+			// add link to main page
+			str = "[Main page](/)\n\n" + str
+
 			// generate markdown
 			html := blackfriday.Run([]byte(str))
 			fmt.Fprintf(w, tmpl, html)

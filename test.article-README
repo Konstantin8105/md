@@ -19,7 +19,9 @@
 	</head>
 	<body>
 		<article class="markdown-body">
-			<h1>md</h1>
+			<p><a href="/">Main page</a></p>
+
+<h1>md</h1>
 
 <p>minimal markdown web blog</p>
 
