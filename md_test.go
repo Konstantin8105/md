@@ -52,6 +52,13 @@ func Test(t *testing.T) {
 		},
 	}
 
+	// modify expect filename
+	for i := range tcs {
+		tcs[i].expectFilename = "testdata" +
+			string(os.PathSeparator) +
+			tcs[i].expectFilename
+	}
+
 	for i := range tcs {
 		t.Run(tcs[i].url, func(t *testing.T) {
 			req := httptest.NewRequest("GET", tcs[i].url, nil)
