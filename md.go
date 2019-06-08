@@ -14,6 +14,9 @@ import (
 	"github.com/russross/blackfriday"
 )
 
+// Windows OS specific variable name
+const windowsOs string = "windows"
+
 var tmpl = `
 <html>
 	<head>
@@ -148,7 +151,7 @@ func mainHandler(w http.ResponseWriter, r *http.Request) {
 						mainTmpl += "#"
 					}
 					f := folders[i]
-					if runtime.GOOS == "windows" {
+					if runtime.GOOS == windowsOs {
 						f = strings.Replace(f, "\\", "/", -1)
 					}
 					mainTmpl += fmt.Sprintf(" %s\n\n", f)
@@ -156,7 +159,7 @@ func mainHandler(w http.ResponseWriter, r *http.Request) {
 				path := folders[i] + string(os.PathSeparator) + file.Name()
 
 				// Windows specific
-				if runtime.GOOS == "windows" {
+				if runtime.GOOS == windowsOs {
 					path = strings.Replace(path, "\\", "/", -1)
 				}
 
@@ -231,7 +234,7 @@ func articleHandler(w http.ResponseWriter, r *http.Request) {
 		title = strings.ReplaceAll(title, "..", "doubledot")
 
 		// Windows specific
-		if runtime.GOOS == "windows" {
+		if runtime.GOOS == windowsOs {
 			title = strings.Replace(title, "/", "\\", -1)
 		}
 
@@ -245,7 +248,7 @@ func articleHandler(w http.ResponseWriter, r *http.Request) {
 			var content []byte
 			content, err = ioutil.ReadFile(title)
 			if err != nil {
-				if runtime.GOOS == "windows" {
+				if runtime.GOOS == windowsOs {
 					title = strings.Replace(title, "\\", "/", -1)
 				}
 				err = fmt.Errorf("Cannot read file `%s`: %v", title, err)
