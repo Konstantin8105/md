@@ -11,7 +11,13 @@ import (
 	"strconv"
 	"strings"
 	"testing"
+
+	"github.com/Konstantin8105/cs"
 )
+
+func TestCS(t *testing.T) {
+	cs.All(t)
+}
 
 func Test(t *testing.T) {
 
