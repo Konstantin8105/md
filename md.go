@@ -45,8 +45,11 @@ var tmpl = `
 
 func main() {
 	// create flags
-	help := flag.Bool("h", false, "print help information")
-	port := flag.String("p", "8080", "server port")
+	var (
+		help  = flag.Bool("h", false, "print help information")
+		port  = flag.String("p", "8080", "server port")
+		chdir = flag.String("ch", ".", "changes the current working directory to the named directory")
+	)
 
 	// parsing flags
 	flag.Parse()
@@ -59,6 +62,10 @@ func main() {
 	if *help {
 		flag.PrintDefaults()
 		os.Exit(0)
+	}
+
+	if err := os.Chdir(*chdir); err != nil {
+		fmt.Fprintf(os.Stderr, "cannot change directory : %v", err)
 	}
 
 	// output used server port
