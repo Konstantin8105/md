@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"path/filepath"
 	"runtime"
 	"sort"
 	"strings"
@@ -16,6 +17,13 @@ import (
 
 // Windows OS specific variable name
 const windowsOs string = "windows"
+
+// photos folders
+const photos string = "photos"
+
+func IsPhotos(str string) bool {
+	return strings.Contains(str, string(filepath.Separator)+photos)
+}
 
 var tmpl = `
 <html>
@@ -33,6 +41,12 @@ var tmpl = `
 				.markdown-body {
 					padding: 15px;
 				}
+			}
+			img{
+				max-height:500px;
+				max-width:500px;
+				height:auto;
+				width:auto;
 			}
 	</style>
 	</head>
@@ -77,6 +91,8 @@ func main() {
 	http.HandleFunc("/", mainHandler)
 	// generate articles
 	http.HandleFunc("/articles/", articleHandler)
+	// generate photos
+	http.HandleFunc("/"+photos+"/", photosHandler)
 
 	// start server
 	if err := http.ListenAndServe(":"+*port, nil); err != nil {
@@ -132,7 +148,6 @@ func mainHandler(w http.ResponseWriter, r *http.Request) {
 
 		// find all markdown files
 		for i := range folders {
-
 			files, err := ioutil.ReadDir(folders[i])
 			if err != nil {
 				return err
@@ -149,7 +164,6 @@ func mainHandler(w http.ResponseWriter, r *http.Request) {
 
 				if !folderHeader {
 					folderHeader = true
-
 					mainTmpl += "------\n\n"
 					count := strings.Count(folders[i], "\\")
 					count += strings.Count(folders[i], "/")
@@ -198,6 +212,21 @@ func mainHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		mainTmpl += "------\n\n"
 
+		// photos
+		func() {
+			files, err := ioutil.ReadDir(photos)
+			if err != nil {
+				return
+			}
+			mainTmpl += fmt.Sprintf("# PHOTOS\n\n")
+			for _, file := range files {
+				name := file.Name()
+				mainTmpl += fmt.Sprintf("[%s](/photos/%s)\n\n", name, name)
+				mainTmpl += "\n\n"
+			}
+			mainTmpl += "------\n\n"
+		}()
+
 		// generate html by markdown
 		html := blackfriday.Run([]byte(mainTmpl))
 		fmt.Fprintf(w, tmpl, html)
@@ -214,7 +243,7 @@ func articleHandler(w http.ResponseWriter, r *http.Request) {
 	if err := func() (err error) {
 		defer func() {
 			if err != nil {
-				err = fmt.Errorf("Try open page: %v. %v", r.URL.Path, err)
+				err = fmt.Errorf("Try open page in article: %v. %v", r.URL.Path, err)
 			}
 		}()
 		// get title
@@ -273,6 +302,81 @@ func articleHandler(w http.ResponseWriter, r *http.Request) {
 			fmt.Fprintf(w, tmpl, html)
 		} else {
 			http.ServeFile(w, r, title)
+		}
+		return
+	}(); err != nil {
+		fmt.Fprintf(w, "Error : %v\n", err)
+	}
+}
+
+// photosHandler generate web page with photos
+func photosHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(os.Stdout, "GET : %v\n", r.URL.Path)
+
+	if err := func() (err error) {
+		defer func() {
+			if err != nil {
+				err = fmt.Errorf("Try open page in photos: %v. %v", r.URL.Path, err)
+			}
+		}()
+		// get title
+		path := r.URL.Path
+		if len(path) <= len("/"+photos+"/") {
+			err = fmt.Errorf("URL path is too small: %s", path)
+			return
+		}
+		title := path[len("/"+photos+"/")-1:]
+		title = strings.TrimSpace(title)
+		if title == "" {
+			err = fmt.Errorf("Title of photos is empty")
+			return
+		}
+		// Unescape url
+		title, err = url.QueryUnescape(title)
+		if title == "" {
+			err = fmt.Errorf("Cannot unescape : %v", err)
+			return
+		}
+
+		// secury fix of title
+		// avoid word ".."
+		title = strings.ReplaceAll(title, "..", "doubledot")
+
+		// Windows specific
+		if runtime.GOOS == windowsOs {
+			title = strings.Replace(title, "/", "\\", -1)
+		}
+
+		// fix first letter
+		if len(title) > 0 && (title[0] == '\\' || title[0] == '/') {
+			title = title[1:]
+		}
+
+		index := strings.LastIndex(title, string(filepath.Separator))
+		if index < 0 {
+			// folder list
+			f := photos + string(filepath.Separator) + title
+			files, err := ioutil.ReadDir(f)
+			if err != nil {
+				err = fmt.Errorf("readdir :`%s`. %v", f, err)
+				return err
+			}
+			var content string
+			content += "[Main page](/)\n\n"
+			content += fmt.Sprintf("%s\n\n", title)
+			for _, file := range files {
+				content += fmt.Sprintf("![%s](/%s/%s/%s)\n\n",
+					file.Name(),
+					photos,
+					title,
+					file.Name(),
+				)
+			}
+			html := blackfriday.Run([]byte(content))
+			fmt.Fprintf(w, tmpl, html)
+		} else {
+			// view file
+			http.ServeFile(w, r, photos+string(filepath.Separator)+title)
 		}
 		return
 	}(); err != nil {
